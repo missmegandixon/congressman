@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Whose congressman is that, anyway?</title>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+
+  </head>
+  <body>
+      <div class="container">
+        <div class="row">
+          <header> Whose Congressman is That, Anyway?!?</header>
+        </div>
+        <div class="row">
+          <div class="col-md-6"> CONGRESSMAN</div>
+          <div class="col-md-6">GUESS</div>
+        </div>
+      </div>
+
+
+
+
+
+    <hr/>
+    <pre id="debug">
+      Loading...
+    </pre>
+
+    <script type="text/javascript">
+      var congressmenData;
+
+      function fetchCongressmen(limit) {
+        $.get("https://www.govtrack.us/api/v2/role?current=true&limit="+limit+"&role_type=representative&fields=id,party,person__name,person__youtubeid,state,website,description,person__link", function(data) {
+          // store the congressmen
+          congressmenData = data.objects;
+
+          // display for easy debugging
+          $("#debug").text(JSON.stringify(congressmenData));
+
+          // fetch their headshots
+          congressmenData.forEach(function(congressperson) {
+            fetchMoneyshot(congressperson);
+          });
+        });
+      }
+
+      function fetchMoneyshot(face) {
+        console.log(face.person.link)
+        $.get(face.person.link, function(profile_page) {
+          console.log( $(profile_page).$("div.photo > img")[0] )
+        });
+      }
+
+      // kick it all off
+      fetchCongressmen(2);
+    </script>
+  </body>
+</html>
+
+
+<!-- {
+ "description": "Representative for Illinois's 18th congressional district",
+ "id": 43744,
+ "party": "Republican",
+ "person": {
+  "name": "Rep. Darin LaHood [R-IL18]",
+  "youtubeid": null
+ },
+ "state": "IL",
+ "website": "https://lahood.house.gov/"
+},  -->
