@@ -17,9 +17,22 @@
       color: #D0D3D4;
   }
   .container {
-      background-color: #D0D3D4;
       color: #003057;
   }
+  #question {
+      padding-left: 250px;
+  }
+  #answer {
+      text-align: left;
+      padding-top: 15px;
+      font-size: 20px;
+  }
+  #answer button {
+    display: block;
+    clear: both;
+    margin: 1em;
+  }
+
   h3 {
     text-align: center;
   }
@@ -31,17 +44,25 @@
       <div class="jumbotron text-center">
         <h2> Whose Congressman is That, Anyway?</h2>
       </div>
-        <div class="container">
-          <div class="row">
-            <div id="question" class="col-md-6">
-              <img align="center" width="150" height="108" src="http://lovelace-media.imgix.net/uploads/25/378bc2a0-4376-0133-9d86-0af7184f89fb.gif" class="img-circle" alt="Trump">
-              Loading...
-            </div>
-            <div id="answer" class="col-md-6">
-             <h3>Guess</h3>
-           </div>
-         </div>
-       </div>
+      <div class="container">
+        <div class="row">
+          <div id="question" class="col-md-6">
+            <img align="center" width="150" height="108" src="http://lovelace-media.imgix.net/uploads/25/378bc2a0-4376-0133-9d86-0af7184f89fb.gif" class="img-circle" alt="Trump">
+            Loading...
+          </div>
+          <div id="answer" class="col-md-6">
+            <h3>Loading...</h3>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+
+          </div>
+          <div class="col-md-6">
+            <button type="button" name="next" id="next">Next</button>
+          </div>
+        </div>
+      </div>
 
 
     <hr/>
@@ -49,20 +70,93 @@
       Loading...
     </pre>
 
-   <script type="text/javascript">
-      var congressmenCount, congressmenData;
 
-      function newQuestion() {
-        var randomIndex = Math.floor(Math.random() * (congressmenCount - 1));
-        console.log(randomIndex);
-        var c = congressmenData[randomIndex];
-        var q = $("<img src='"+c.headshot+"' />");
-        var a = c.description;
-        $("#question").html(q);
-        $("#answer").html(a);
+   <script type="text/javascript">
+      function shuffle(array) {
+        var tmp, current, top = array.length;
+
+        if(top) while(--top) {
+          current = Math.floor(Math.random() * (top + 1));
+          tmp = array[current];
+          array[current] = array[top];
+          array[top] = tmp;
+        }
+
+        return array;
       }
 
-      function fetchCongressmen(limit) {
+
+      var congressmenCount, congressmenData, currentCongressperson;
+      var options = {
+        head_size: {
+          width: 225,
+          height: 275
+        }
+      }
+
+      // returns like "225x275" or "450x550"
+      function headSize() {
+        return options.head_size.width + "x" + options.head_size.height;
+      }
+
+      // picks one at random
+      function newCongressman() {
+        currentCongressperson = Math.floor(Math.random() * (congressmenCount - 1));
+        console.log("current congressman is now:", currentCongressperson);
+      }
+
+      function newQuestion() {
+        var c = congressmenData[currentCongressperson];
+        var q = $(
+          "<img width="+options.head_size.width+" height="+options.head_size.height+" src='"+c.headshot+"' /><br/>" +
+          "<h5>"+c.description+"</h5>"
+        );
+        $("#question").html(q);
+      }
+
+      function wrongAnswer() {
+        var randomIndex, randomName;
+        do {
+          randomIndex = Math.floor(Math.random() * (congressmenCount - 1));
+          randomName = congressmenData[randomIndex].person.name;
+        } while (randomIndex == currentCongressperson);
+        return randomName;
+      }
+
+      function newAnswers(argument) {
+        $("#answer").html(""); // start over
+        var c = congressmenData[currentCongressperson];
+
+        var correctAnswer = $("<button type=\"button\">" + c.person.name + "</button>").click(function () {
+          alert("Correct!");
+        });
+
+        var mixedAnswers = [
+          correctAnswer,
+          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+            alert("Wrong! Correct answer was " + c.person.name);
+          }),
+          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+            alert("Wrong! Correct answer was " + c.person.name);
+          }),
+          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+            alert("Wrong! Correct answer was " + c.person.name);
+          })
+        ];
+
+        shuffle(mixedAnswers).forEach(function (answer) {
+          $("#answer").append(answer);
+        });
+
+      }
+
+      function displayQandA() {
+        newCongressman();
+        newQuestion();
+        newAnswers();
+      }
+
+      function fetchCongress(limit) {
         $.get("https://www.govtrack.us/api/v2/role?current=true&limit="+limit+"&role_type=representative&fields=id,person__bioguideid,party,person__name,person__youtubeid,state,website,description,person__link",
          function(data) {
           // store the congressmen
@@ -77,31 +171,23 @@
             congressperson.headshot = moneyshot(congressperson);
           });
 
-          setTimeout(newQuestion, 2000)
+          displayQandA();
         });
       }
 
       function moneyshot(face) {
-        var size = "225x275"; // "450x550"
         var id = face.person.bioguideid;
-        return "https://theunitedstates.io/images/congress/"+size+"/"+id+".jpg";
+        return "https://theunitedstates.io/images/congress/"+headSize()+"/"+id+".jpg";
       }
 
       // kick it all off
-      fetchCongressmen(600);
+      fetchCongress(600);
+
+      $(document).ready(function() {
+        $("button#next").click(function() {
+          displayQandA();
+        });
+      });
     </script>
   </body>
 </html>
-
-
-<!-- {
- "description": "Representative for Illinois's 18th congressional district",
- "id": 43744,
- "party": "Republican",
- "person": {
-  "name": "Rep. Darin LaHood [R-IL18]",
-  "youtubeid": null
- },
- "state": "IL",
- "website": "https://lahood.house.gov/"
-},  -->
