@@ -66,9 +66,9 @@
 
 
     <hr/>
-    <pre id="debug">
+  <!--  <pre id="debug">
       Loading...
-    </pre>
+    </pre> -->
 
 
    <script type="text/javascript">
@@ -123,7 +123,7 @@
         return randomName;
       }
 
-      function newAnswers(argument) {
+      function newAnswers() {
         $("#answer").html(""); // start over
         var c = congressmenData[currentCongressperson];
 
@@ -164,7 +164,7 @@
           congressmenData = data.objects;
 
           // display for easy debugging
-          $("#debug").text(JSON.stringify(congressmenData));
+        //  $("#debug").text(JSON.stringify(congressmenData));
 
           // fetch their headshots
           congressmenData.forEach(function(congressperson) {
