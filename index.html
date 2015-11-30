@@ -56,21 +56,13 @@
         </div>
         <div class="row">
           <div class="col-md-6">
-
-          </div>
+        </div>
           <div class="col-md-6">
             <button type="button" name="next" id="next">Next</button>
           </div>
         </div>
       </div>
-
-
     <hr/>
-  <!--  <pre id="debug">
-      Loading...
-    </pre> -->
-
-
    <script type="text/javascript">
       function shuffle(array) {
         var tmp, current, top = array.length;
@@ -102,7 +94,6 @@
       // picks one at random
       function newCongressman() {
         currentCongressperson = Math.floor(Math.random() * (congressmenCount - 1));
-        console.log("current congressman is now:", currentCongressperson);
       }
 
       function newQuestion() {
@@ -127,19 +118,19 @@
         $("#answer").html(""); // start over
         var c = congressmenData[currentCongressperson];
 
-        var correctAnswer = $("<button type=\"button\">" + c.person.name + "</button>").click(function () {
+        var correctAnswer = $("<button type='button'>" + c.person.name + "</button>").click(function () {
           alert("Correct!");
         });
 
         var mixedAnswers = [
           correctAnswer,
-          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+          $("<button type='button'>" + wrongAnswer() + "</button>").click(function () {
             alert("Wrong! Correct answer was " + c.person.name);
           }),
-          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+          $("<button type='button'>" + wrongAnswer() + "</button>").click(function () {
             alert("Wrong! Correct answer was " + c.person.name);
           }),
-          $("<button type=\"button\">" + wrongAnswer() + "</button>").click(function () {
+          $("<button type='button'>" + wrongAnswer() + "</button>").click(function () {
             alert("Wrong! Correct answer was " + c.person.name);
           })
         ];
@@ -162,10 +153,6 @@
           // store the congressmen
           congressmenCount = data.meta.total_count;
           congressmenData = data.objects;
-
-          // display for easy debugging
-        //  $("#debug").text(JSON.stringify(congressmenData));
-
           // fetch their headshots
           congressmenData.forEach(function(congressperson) {
             congressperson.headshot = moneyshot(congressperson);
